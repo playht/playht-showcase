@@ -14,6 +14,18 @@ if (process.env.USER_ID === undefined || process.env.API_KEY === undefined) {
   console.log('API_KEY =', process.env.API_KEY.substring(0, 4) + '...');
 }
 
+const model = process.env.MODEL ?? 'Play3.0-mini';
+if (!['Play3.0-mini', 'PlayDialog', 'PlayDialogMultilingual'].includes(model)) {
+  console.error(`Invalid model "${model}". Please use one of the following models: Play3.0-mini, PlayDialog, PlayDialogMultilingual`);
+  process.exit(1);
+}
+
+const [major] = process.versions.node.split('.').map(Number);
+if (major < 20) {
+  console.log(`Please use Node.js version 20 or higher to run this demo. Version used: ${process.version}`);
+  process.exit(1);
+}
+
 async function getAuthenticatedWebSocketUrl() {
   try {
     const url = 'https://api.play.ht/api/v3/websocket-auth';
