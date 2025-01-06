@@ -28,7 +28,7 @@ if (major < 20) {
 
 async function getAuthenticatedWebSocketUrl() {
   try {
-    const url = 'https://api.play.ht/api/v3/websocket-auth';
+    const url = 'https://api.play.ht/api/v4/websocket-auth';
     const headers = {
       Authorization: 'Bearer ' + process.env.API_KEY,
       'X-User-Id': process.env.USER_ID!,
