@@ -146,7 +146,6 @@
       function sendCommand() {
         clearAudioBuffer();
         const command = {
-          request_id: 'rid-'+Date.now(),
           text: inputText.value,
           voice: voiceInput.value,
         };
