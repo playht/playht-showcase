@@ -15,16 +15,18 @@ if (process.env.USER_ID === undefined || process.env.API_KEY === undefined) {
 }
 
 const model = process.env.MODEL ?? 'Play3.0-mini';
-if (!['Play3.0-mini', 'PlayDialog', 'PlayDialogMultilingual'].includes(model)) {
-  console.error(`Invalid model "${model}". Please use one of the following models: Play3.0-mini, PlayDialog, PlayDialogMultilingual`);
+if (!['Play3.0-mini', 'PlayDialog', 'PlayDialogMultilingual', 'PlayDialogArabic'].includes(model)) {
+  console.error(`Invalid model "${model}". Please use one of the following models: Play3.0-mini, PlayDialog, PlayDialogMultilingual, PlayDialogArabic`);
   process.exit(1);
 }
+console.log('MODEL =', process.env.MODEL);
 
 const [major] = process.versions.node.split('.').map(Number);
 if (major < 20) {
   console.log(`Please use Node.js version 20 or higher to run this demo. Version used: ${process.version}`);
   process.exit(1);
 }
+type WebSocketAuthResponseSchema = { websocket_urls: Record<string, string>, expires_at: string };
 
 async function getAuthenticatedWebSocketUrl() {
   try {
@@ -43,7 +45,7 @@ async function getAuthenticatedWebSocketUrl() {
       );
     }
 
-    return (await response.json()) as { websocket_url: string; expires_at: string };
+    return (await response.json()) as WebSocketAuthResponseSchema;
   } catch (e) {
     console.error(`Error while obtaining authenticated websocket URL: ${e}`, e);
     throw e;
@@ -55,9 +57,15 @@ const app = express();
 app.all('*', async (_, res) => {
   try {
     const result = await getAuthenticatedWebSocketUrl();
+    const webSocketUrl = result.websocket_urls[model];
+    if (!webSocketUrl) {
+      res.status(400).send(`Websocket URL for model ${model} not found in response: ${JSON.stringify(result)}`);
+      return;
+    }
     const pageContent = fs
       .readFileSync(`${import.meta.dirname}/websocket.html`, 'utf8')
-      .replaceAll('<%= WEBSOCKET_URL %>', result.websocket_url);
+      .replaceAll('<%= SELECTED_MODEL %>', model)
+      .replaceAll('<%= WEBSOCKET_URL %>', webSocketUrl);
     res.status(200).send(pageContent);
   } catch (e) {
     console.error(`Error serving HTML page: ${e}`, e);
