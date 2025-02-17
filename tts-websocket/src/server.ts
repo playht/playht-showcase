@@ -16,7 +16,9 @@ if (process.env.USER_ID === undefined || process.env.API_KEY === undefined) {
 
 const model = process.env.MODEL ?? 'Play3.0-mini';
 if (!['Play3.0-mini', 'PlayDialog', 'PlayDialogMultilingual', 'PlayDialogArabic'].includes(model)) {
-  console.error(`Invalid model "${model}". Please use one of the following models: Play3.0-mini, PlayDialog, PlayDialogMultilingual, PlayDialogArabic`);
+  console.error(
+    `Invalid model "${model}". Please use one of the following models: Play3.0-mini, PlayDialog, PlayDialogMultilingual, PlayDialogArabic`,
+  );
   process.exit(1);
 }
 console.log('MODEL =', process.env.MODEL);
@@ -26,7 +28,7 @@ if (major < 20) {
   console.log(`Please use Node.js version 20 or higher to run this demo. Version used: ${process.version}`);
   process.exit(1);
 }
-type WebSocketAuthResponseSchema = { websocket_urls: Record<string, string>, expires_at: string };
+type WebSocketAuthResponseSchema = { websocket_urls: Record<string, string>; expires_at: string };
 
 async function getAuthenticatedWebSocketUrl() {
   try {
